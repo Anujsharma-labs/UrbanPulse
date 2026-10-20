@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import pyodbc
+# import pyodbc
 import requests
 import folium
 
@@ -90,6 +90,8 @@ st.markdown(
 
 # ================= SQL CONNECTION =================
 def get_connection():
+    import pyodbc
+
     return pyodbc.connect(
         "DRIVER={ODBC Driver 17 for SQL Server};"
         r"SERVER=DESKTOP-MFO7PT7\ANUJ;"
