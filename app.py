@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-# import pyodbc
 import requests
 import folium
 
