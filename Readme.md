@@ -2,75 +2,64 @@
 
 ### *Faster Routes. Smarter Decisions. Every Second Matters.*
 
-UrbanPulse is a smart emergency route planning application designed to help users identify road routes to hospitals, estimate travel time, and visualize journeys through an interactive map.
+UrbanPulse is a smart emergency route planning application designed to simplify journey planning through interactive route visualization, road distance calculation, and estimated travel time (ETA).
 
-Built with **Python, Streamlit, SQL Server, and OSRM**, UrbanPulse combines route calculation, ETA estimation, interactive mapping, and trip history in one dashboard.
+Built using **Python, Streamlit, SQL Server, and OSRM**, UrbanPulse combines routing services, interactive maps, and database integration in a modern dashboard to support smarter emergency journey planning.
 
----
+## 🖥️ Dashboard Preview
+
+![UrbanPulse Dashboard](screenshots/urbanpulse_dashboard.png)
 
 ## ✨ Key Features
 
-- 🗺️ **Interactive Route Visualization** — View road routes between selected pickup and destination locations.
-- 🚑 **Emergency Route Planning** — Select locations and calculate a suggested driving route.
-- ⏱️ **ETA Estimation** — Estimate travel duration using routing engine data.
-- 📏 **Road Distance Calculation** — Get the calculated road distance in kilometers.
+- 🚑 **Emergency Route Planning** — Select pickup and destination locations to find a suggested road route.
+- 🗺️ **Interactive Route Map** — Visualize the route with pickup and destination markers.
+- ⏱️ **ETA Estimation** — Estimate travel duration using routing service data.
+- 📏 **Road Distance Calculation** — Calculate the driving distance between selected locations.
 - 📍 **Location Selection** — Choose from predefined locations in Jaipur.
-- 💾 **Trip History** — Save trip details to SQL Server and review previously saved journeys.
+- 💾 **Trip History Management** — Save trip details to SQL Server and review previous journeys.
 - 🌌 **Modern Dashboard UI** — Dark-themed interface with a background image and glass-style panels.
-
----
 
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Application logic |
-| Streamlit | Interactive web dashboard |
-| OSRM | Road route and travel-time estimates |
-| Folium | Interactive route maps |
-| Streamlit-Folium | Map integration with Streamlit |
-| SQL Server | Trip history storage |
-| PyODBC | Python–SQL Server connectivity |
+| Python | Core application logic |
+| Streamlit | Interactive web application |
+| OSRM | Road routing and travel-time estimates |
+| Folium | Interactive map visualization |
+| Streamlit-Folium | Integrating maps into Streamlit |
+| SQL Server | Persistent trip history storage |
+| PyODBC | Database connectivity |
+| Pandas | Tabular data handling |
 | Requests | Routing API communication |
-| Pandas | Trip history data handling |
 
----
+## 🔄 How It Works
 
-## ⚙️ How It Works
-
-1. Select a pickup location and destination.
-2. UrbanPulse sends the coordinates to the OSRM routing service.
-3. The routing service returns a road route, distance, and estimated duration.
-4. The application displays the route, pickup/destination markers, distance, and ETA.
-5. Save the trip to store its details in SQL Server.
-6. View previously saved trips from the trip history section.
-
----
-
-## 🖥️ Application Preview
-
-Add a screenshot of your dashboard here:
-
-```markdown
-![UrbanPulse Dashboard](screenshots/urbanpulse_dashboard.png)
-```
-
-Create a `screenshots` folder in the repository and add your dashboard screenshot using the filename shown above.
-
----
+1. **Select Locations:** Choose a pickup point and destination.
+2. **Calculate Route:** The application requests a driving route from OSRM.
+3. **Estimate Journey:** Retrieve the road distance and estimated travel duration.
+4. **Visualize Route:** Display the suggested route on an interactive map.
+5. **Save Trip:** Store the trip details in SQL Server.
+6. **Review History:** View previously saved trips in the dashboard.
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
+### Prerequisites
+
+- Python 3.10 or a compatible version
+- SQL Server
+- Microsoft ODBC Driver 17 for SQL Server
+- Internet connection for routing and map tiles
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Anujsharma-labs/UrbanPulse.git
 cd UrbanPulse
 ```
 
-If your repository uses a different URL or capitalization, use its actual GitHub URL.
-
-### 2. Create a virtual environment
+### 2. Create a Virtual Environment
 
 ```bash
 python -m venv .venv
@@ -82,27 +71,36 @@ Activate it on Windows:
 .venv\Scripts\activate
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
+Ensure `requirements.txt` contains:
+
+```text
+streamlit
+pandas
+pyodbc
+requests
+folium
+streamlit-folium
+```
+
 ### 4. Configure SQL Server
 
-Ensure SQL Server is running and create the required database and table. Update the connection settings in `app.py` to match your local SQL Server configuration.
+Make sure SQL Server is running and the `UrbanPulse` database and required `dbo.jaipur_trip_predictions` table exist.
 
-The application currently uses Windows Trusted Authentication with ODBC Driver 17.
+Update the database connection in `app.py` to match your local SQL Server instance. The current configuration uses Windows Trusted Authentication.
 
-### 5. Run the application
+### 5. Run UrbanPulse
 
 ```bash
 streamlit run app.py
 ```
 
-Open the local URL shown in your terminal.
-
----
+Open the local URL displayed in the terminal to access the dashboard.
 
 ## 📂 Project Structure
 
@@ -116,28 +114,28 @@ UrbanPulse/
     └── urbanpulse_dashboard.png
 ```
 
----
+## 📊 Project Highlights
 
-## ⚠️ Important Notes
+- Integration of a real road-routing service.
+- End-to-end route calculation and interactive visualization.
+- SQL Server integration for persistent trip records.
+- A user-friendly dashboard built with Streamlit.
+- A modular foundation for future emergency mobility features.
 
-- Route calculations use the public OSRM routing service and require an internet connection.
-- ETA is an estimate returned by the routing service, not a guarantee of real-world arrival time.
-- The current application uses predefined Jaipur locations.
-- The current implementation does not provide live traffic analysis, ambulance-priority signals, or emergency dispatch.
-- SQL Server must be configured separately; the local database connection will not automatically work on a cloud host.
+## 🔮 Future Enhancements
 
----
+- 🚦 Live traffic integration for more realistic ETA estimates.
+- 🏥 Nearby hospital discovery and expanded location coverage.
+- 🚨 Ambulance-aware routing using suitable routing services and road data.
+- 📈 Trip analytics and journey insights.
+- ☁️ Cloud deployment with securely hosted database infrastructure.
 
-## 🔮 Future Improvements
+## ⚠️ Limitations
 
-- Integrate live traffic information for more realistic ETA estimates.
-- Expand location coverage beyond predefined locations.
-- Add hospital search and nearby hospital discovery.
-- Introduce ambulance-aware routing where supported by available road data and services.
-- Deploy the application with a securely hosted database.
-- Add trip analytics and route performance insights.
-
----
+- The current version uses predefined locations in Jaipur.
+- ETA is an estimate from the routing service and is not guaranteed to reflect live traffic conditions.
+- Live traffic analysis, ambulance-priority signals, and emergency dispatch are not currently implemented.
+- The SQL Server connection is configured for a local environment and requires separate configuration for cloud deployment.
 
 ## 👨‍💻 Author
 
@@ -147,4 +145,4 @@ GitHub: [@Anujsharma-labs](https://github.com/Anujsharma-labs)
 
 ---
 
-*UrbanPulse — using technology to support smarter emergency journey planning.* 🚑
+*UrbanPulse — building smarter journeys through routing technology and data-driven applications.* 🚑
