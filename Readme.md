@@ -8,7 +8,7 @@ Built using **Python, Streamlit, SQL Server, and OSRM**, UrbanPulse combines rou
 
 ## 🖥️ Dashboard Preview
 
-![UrbanPulse Dashboard](screenshots/urbanpulse_dashboard.png)
+![UrbanPulse Dashboard](Untitled.png)
 
 ## ✨ Key Features
 
