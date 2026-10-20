@@ -1,6 +1,6 @@
 streamlit
 pandas
-pyodbc
+pyodbc==5.2.0
 requests
 folium
 streamlit-folium
