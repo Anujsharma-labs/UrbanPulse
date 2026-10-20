@@ -1,0 +1,6 @@
+streamlit
+pandas
+pyodbc
+requests
+folium
+streamlit-folium
