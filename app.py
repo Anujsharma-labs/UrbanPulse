@@ -206,7 +206,7 @@ if route:
     # Only show the two useful metric cards: distance and estimated travel time.
     metric1, metric2 = st.columns(2)
     metric1.metric("Distance", f"{route['distance_km']:.2f} km")
-    metric2.metric("Estimated travel time", f"{route['eta_min']:.1f} min")
+    metric2.metric("Estimated Arrival", f"{route['eta_min']:.1f} min")
 
     show_route_map(route)
 
