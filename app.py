@@ -192,7 +192,7 @@ if save_clicked:
         else:
             add_to_history(route)
             st.session_state.last_saved_signature = route_signature
-            st.success("Trip current session ki history mein add ho gayi!")
+            st.success("Trip added to your current session's history successfully.!")
 
 if history_clicked:
     st.session_state.show_history = True
@@ -229,7 +229,7 @@ if st.session_state.get("show_history", False):
             st.session_state.show_history = True
             st.rerun()
     else:
-        st.info("Abhi history empty hai. Route calculate karke Save Trip dabao.")
+        st.info("Your history is currently empty. Calculate a route and click Save Trip.")
 
 st.divider()
 st.caption("UrbanPulse • Emergency route estimates powered by OSRM.")
