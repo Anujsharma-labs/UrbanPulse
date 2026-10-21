@@ -182,7 +182,6 @@ if save_clicked:
     if route is None:
         st.warning("Pehle Calculate Route button dabao, phir Save Trip.")
     else:
-        # Avoid duplicate saves if Streamlit reruns after the button click.
         route_signature = (
             route["origin"],
             route["destination"],
@@ -232,4 +231,4 @@ if st.session_state.get("show_history", False):
         st.info("Abhi history empty hai. Route calculate karke Save Trip dabao.")
 
 st.divider()
-st.caption("UrbanPulse demo • Routes/ETAs are estimates, not live traffic or ambulance-priority routing.")
+st.caption("UrbanPulse • Emergency route estimates powered by OSRM.")
