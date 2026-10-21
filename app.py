@@ -3,47 +3,22 @@ import pandas as pd
 import requests
 import folium
 from streamlit_folium import st_folium
+from datetime import datetime
 
-st.set_page_config(page_title="UrbanPulse", page_icon="🚑", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(
+    page_title="UrbanPulse | Emergency Route Planner",
+    page_icon="🚑",
+    layout="wide",
+)
 
-st.markdown("""
-<style>
-.stApp {
-    background: linear-gradient(rgba(4,12,25,.72),rgba(4,12,25,.86)),
-    url("https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=2000&q=90")
-    center center / cover fixed no-repeat;
-    color: #f4f7fb;
-}
-[data-testid="stHeader"] { background: transparent; }
-.block-container { max-width: 1450px; padding-top: 2rem; padding-bottom: 2rem; }
-.hero, .glass-card {
-    background: rgba(10,25,42,.78); border: 1px solid rgba(100,220,255,.35);
-    border-radius: 20px; padding: 28px; margin-bottom: 22px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.25); backdrop-filter: blur(8px);
-}
-.hero h1 { color: white; font-size: 2.8rem; margin-bottom: 5px; }
-.hero p { color: #c9eaff; font-size: 1.05rem; }
-div[data-testid="stMetric"] {
-    background: rgba(10,25,42,.90); border: 1px solid rgba(100,220,255,.3);
-    border-radius: 14px; padding: 18px;
-}
-.stButton > button {
-    background: linear-gradient(90deg,#00b89c,#00a8c8); color: white;
-    border: none; border-radius: 10px; font-weight: 700; min-height: 42px;
-}
-.stButton > button:hover { color: white; border: 1px solid #a3fff0; }
-</style>
-""", unsafe_allow_html=True)
+# -------------------- SESSION STATE --------------------
+if "trip_history" not in st.session_state:
+    st.session_state.trip_history = []
 
-st.markdown("""
-<div class="hero">
-<h1>🚑 UrbanPulse</h1>
-<p>Faster Routes. Safer Journeys. Every Second Matters.</p>
-<p>⚡ Smart Routing &nbsp; • &nbsp; ⏱ Estimated ETA &nbsp; • &nbsp; 🏥 Emergency Support</p>
-</div>
-""", unsafe_allow_html=True)
+if "current_route" not in st.session_state:
+    st.session_state.current_route = None
 
-# Predefined demo locations; coordinates are (latitude, longitude).
+# -------------------- LOCATIONS --------------------
 locations = {
     "SMS Hospital": (26.9124, 75.7873),
     "Jaipur Railway Station": (26.9196, 75.7878),
@@ -53,123 +28,212 @@ locations = {
     "Ajmer Road": (26.9000, 75.7500),
 }
 
-def get_route(origin, destination):
-    url = (
-        "https://router.project-osrm.org/route/v1/driving/"
-        f"{origin[1]},{origin[0]};{destination[1]},{destination[0]}"
-    )
-    response = requests.get(
-        url, params={"overview": "full", "geometries": "geojson"}, timeout=25
-    )
+# -------------------- STYLING --------------------
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background:
+          linear-gradient(rgba(7, 18, 36, 0.86), rgba(7, 18, 36, 0.90)),
+          url("https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=2000&q=80");
+        background-size: cover;
+        background-attachment: fixed;
+        color: #f5f7fb;
+    }
+    [data-testid="stHeader"] { background: rgba(0,0,0,0); }
+    [data-testid="stMetric"] {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 14px;
+        border-radius: 14px;
+    }
+    div.stButton > button {
+        border-radius: 10px;
+        font-weight: 600;
+        min-height: 2.7rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# -------------------- HELPERS --------------------
+def get_route(origin_name, destination_name):
+    """Get a driving route from OSRM. Coordinates are (lat, lon)."""
+    origin = locations[origin_name]
+    destination = locations[destination_name]
+
+    coords = f"{origin[1]},{origin[0]};{destination[1]},{destination[0]}"
+    url = f"https://router.project-osrm.org/route/v1/driving/{coords}"
+    params = {"overview": "full", "geometries": "geojson"}
+
+    response = requests.get(url, params=params, timeout=20)
     response.raise_for_status()
     data = response.json()
-    if data.get("code") != "Ok" or not data.get("routes"):
-        raise ValueError("No road route found for these locations.")
-    route = data["routes"][0]
-    return route["distance"] / 1000, route["duration"] / 60, route["geometry"]["coordinates"]
 
-# Database is optional on cloud. pyodbc is imported only if a DB action is clicked.
-def get_connection():
-    import pyodbc
-    return pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};"
-        r"SERVER=DESKTOP-MFO7PT7\ANUJ;"
-        "DATABASE=UrbanPulse;"
-        "Trusted_Connection=yes;"
-        "TrustServerCertificate=yes;"
-        "Connection Timeout=5;"
+    if data.get("code") != "Ok" or not data.get("routes"):
+        raise ValueError("OSRM did not return a route for these locations.")
+
+    route = data["routes"][0]
+    return {
+        "origin": origin_name,
+        "destination": destination_name,
+        "origin_lat": origin[0],
+        "origin_lon": origin[1],
+        "destination_lat": destination[0],
+        "destination_lon": destination[1],
+        "distance_km": route["distance"] / 1000,
+        "eta_min": route["duration"] / 60,
+        "geometry": route["geometry"]["coordinates"],
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def add_to_history(route):
+    """Store trips only in this user's current Streamlit session."""
+    record = {
+        "Time": route["created_at"],
+        "Pickup": route["origin"],
+        "Destination": route["destination"],
+        "Distance (km)": round(route["distance_km"], 2),
+        "ETA (min)": round(route["eta_min"], 1),
+    }
+    st.session_state.trip_history.insert(0, record)
+
+
+def show_route_map(route):
+    center = [
+        (route["origin_lat"] + route["destination_lat"]) / 2,
+        (route["origin_lon"] + route["destination_lon"]) / 2,
+    ]
+    m = folium.Map(location=center, zoom_start=12, tiles="OpenStreetMap")
+
+    # OSRM GeoJSON route coordinates are [lon, lat]; Folium expects [lat, lon].
+    route_points = [[lat, lon] for lon, lat in route["geometry"]]
+    folium.PolyLine(
+        route_points,
+        color="#00d4ff",
+        weight=6,
+        opacity=0.9,
+        tooltip="Suggested driving route",
+    ).add_to(m)
+
+    folium.Marker(
+        [route["origin_lat"], route["origin_lon"]],
+        tooltip=f"Pickup: {route['origin']}",
+        popup=f"Pickup: {route['origin']}",
+        icon=folium.Icon(color="green", icon="play"),
+    ).add_to(m)
+
+    folium.Marker(
+        [route["destination_lat"], route["destination_lon"]],
+        tooltip=f"Destination: {route['destination']}",
+        popup=f"Destination: {route['destination']}",
+        icon=folium.Icon(color="red", icon="flag"),
+    ).add_to(m)
+
+    if route_points:
+        m.fit_bounds(route_points)
+
+    st_folium(m, use_container_width=True, height=480, key="urbanpulse_route_map")
+
+
+# -------------------- HEADER --------------------
+st.title("🚑 UrbanPulse")
+st.caption("Emergency Route Planning Dashboard")
+st.info(
+    "Demo limitation: routes and ETA come from OSRM. Trip history is stored only "
+    "for the current browser session and is not saved to a permanent database."
+)
+
+# -------------------- ROUTE PLANNER --------------------
+st.subheader("Plan an Emergency Route")
+left, right = st.columns(2)
+
+with left:
+    origin_name = st.selectbox("Pickup location", list(locations.keys()), key="origin_select")
+
+with right:
+    destination_options = [name for name in locations if name != origin_name]
+    destination_name = st.selectbox(
+        "Destination",
+        destination_options,
+        key="destination_select",
     )
 
-def save_trip(origin, destination, distance, eta):
-    query = """
-    INSERT INTO dbo.jaipur_trip_predictions
-    (distance_km, origin_lat, origin_lon, destination_lat, destination_lon, predicted_duration_min)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """
-    with get_connection() as conn:
-        conn.cursor().execute(
-            query, float(distance), float(origin[0]), float(origin[1]),
-            float(destination[0]), float(destination[1]), float(eta)
-        )
-        conn.commit()
+plan_col, save_col, history_col = st.columns([2, 1, 1])
 
-st.markdown("""
-<div class="glass-card">
-<h3>📍 Plan Your Emergency Trip</h3>
-<p>Select your pickup and destination to find a road route.</p>
-</div>
-""", unsafe_allow_html=True)
+with plan_col:
+    plan_clicked = st.button("🗺️ Calculate Route", use_container_width=True, type="primary")
+with save_col:
+    save_clicked = st.button("💾 Save Trip", use_container_width=True)
+with history_col:
+    history_clicked = st.button("📜 Show History", use_container_width=True)
 
-col1, col2 = st.columns(2)
-with col1:
-    pickup_name = st.selectbox("🟢 Pickup Location", list(locations.keys()), index=1)
-with col2:
-    destination_name = st.selectbox("🔴 Hospital / Destination", list(locations.keys()), index=0)
-
-if st.button("🚑 Find Route & Estimate ETA", type="primary"):
-    if pickup_name == destination_name:
-        st.warning("Please select two different locations.")
-    else:
-        try:
-            origin, destination = locations[pickup_name], locations[destination_name]
-            with st.spinner("Calculating road route..."):
-                distance, eta, coordinates = get_route(origin, destination)
-            st.session_state["trip"] = {
-                "origin": origin, "destination": destination,
-                "pickup_name": pickup_name, "destination_name": destination_name,
-                "distance": distance, "eta": eta, "coordinates": coordinates,
-            }
-        except Exception as e:
-            st.error(f"Route calculation failed: {e}")
-
-if "trip" in st.session_state:
-    trip = st.session_state["trip"]
-    st.markdown('<div class="glass-card"><h3>🗺️ Your Route</h3></div>', unsafe_allow_html=True)
-    route_points = [(lat, lon) for lon, lat in trip["coordinates"]]
-    route_map = folium.Map(location=trip["origin"], zoom_start=13, tiles="OpenStreetMap", control_scale=True)
-    folium.Marker(trip["origin"], tooltip="Pickup", popup=trip["pickup_name"],
-                  icon=folium.Icon(color="green", icon="play")).add_to(route_map)
-    folium.Marker(trip["destination"], tooltip="Destination", popup=trip["destination_name"],
-                  icon=folium.Icon(color="red", icon="plus")).add_to(route_map)
-    folium.PolyLine(route_points, color="#00b89c", weight=6, opacity=.95,
-                    tooltip="Suggested road route").add_to(route_map)
-    route_map.fit_bounds(route_points)
-    st_folium(route_map, use_container_width=True, height=460, key="urbanpulse_route_map")
-
-    metric1, metric2 = st.columns(2)
-    metric1.metric("🛣️ Road Distance", f"{trip['distance']:.2f} km")
-    metric2.metric("⏱️ Estimated Arrival", f"{trip['eta']:.1f} minutes")
-    st.write(f"**Pickup:** {trip['pickup_name']}")
-    st.write(f"**Destination:** {trip['destination_name']}")
-
-    if st.button("💾 Save Your Trip"):
-        try:
-            save_trip(trip["origin"], trip["destination"], trip["distance"], trip["eta"])
-            st.success("Your trip has been saved to SQL Server!")
-        except Exception as e:
-            st.warning("Route works, but saving requires database access. The deployed app cannot reach your local SQL Server. "
-                       f"Details: {e}")
-
-st.divider()
-st.markdown('<div class="glass-card"><h3>📋 Your Trip History</h3></div>', unsafe_allow_html=True)
-if st.button("View Your Trip History"):
+if plan_clicked:
     try:
-        with get_connection() as conn:
-            history = pd.read_sql_query("""
-                SELECT TOP 20 prediction_id AS [Trip ID],
-                       distance_km AS [Distance (km)],
-                       predicted_duration_min AS [Estimated ETA (min)],
-                       created_at AS [Created At]
-                FROM dbo.jaipur_trip_predictions
-                ORDER BY prediction_id DESC
-            """, conn)
-        if history.empty:
-            st.info("No saved trips yet.")
+        with st.spinner("Calculating route..."):
+            route = get_route(origin_name, destination_name)
+        st.session_state.current_route = route
+        st.success("Route calculated successfully!")
+    except requests.RequestException:
+        st.error("Route service is temporarily unavailable. Please try again.")
+    except (ValueError, KeyError) as exc:
+        st.error(f"Could not calculate route: {exc}")
+
+if save_clicked:
+    route = st.session_state.current_route
+    if route is None:
+        st.warning("Pehle Calculate Route button dabao, phir Save Trip.")
+    else:
+        # Avoid duplicate saves if Streamlit reruns after the button click.
+        route_signature = (
+            route["origin"],
+            route["destination"],
+            route["created_at"],
+        )
+        if st.session_state.get("last_saved_signature") == route_signature:
+            st.info("Ye trip already current session ki history mein hai.")
         else:
-            st.dataframe(history, use_container_width=True, hide_index=True)
-    except Exception as e:
-        st.warning("Trip history requires a database accessible from the deployed app. "
-                   f"Details: {e}")
+            add_to_history(route)
+            st.session_state.last_saved_signature = route_signature
+            st.success("Trip current session ki history mein add ho gayi!")
+
+if history_clicked:
+    st.session_state.show_history = True
+
+# -------------------- CURRENT ROUTE --------------------
+route = st.session_state.current_route
+if route:
+    st.divider()
+    st.subheader(f"Route: {route['origin']} → {route['destination']}")
+    metric1, metric2, metric3 = st.columns(3)
+    metric1.metric("Distance", f"{route['distance_km']:.2f} km")
+    metric2.metric("Estimated travel time", f"{route['eta_min']:.1f} min")
+    metric3.metric("Route service", "OSRM")
+
+    show_route_map(route)
+
+# -------------------- HISTORY --------------------
+if st.session_state.get("show_history", False):
+    st.divider()
+    st.subheader("📜 Trip History")
+    if st.session_state.trip_history:
+        history_df = pd.DataFrame(st.session_state.trip_history)
+        st.dataframe(history_df, use_container_width=True, hide_index=True)
+        csv_data = history_df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            "⬇️ Download History CSV",
+            data=csv_data,
+            file_name="urbanpulse_trip_history.csv",
+            mime="text/csv",
+        )
+        if st.button("🧹 Clear Session History"):
+            st.session_state.trip_history = []
+            st.session_state.show_history = True
+            st.rerun()
+    else:
+        st.info("Abhi history empty hai. Route calculate karke Save Trip dabao.")
 
 st.divider()
-st.caption("🚑 URBANPULSE • Smart Emergency Route Planning")
+st.caption("UrbanPulse demo • Routes/ETAs are estimates, not live traffic or ambulance-priority routing.")
