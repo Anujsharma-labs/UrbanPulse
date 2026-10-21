@@ -141,10 +141,6 @@ def show_route_map(route):
 # -------------------- HEADER --------------------
 st.title("🚑 UrbanPulse")
 st.caption("Emergency Route Planning Dashboard")
-st.info(
-    "Demo limitation: routes and ETA come from OSRM. Trip history is stored only "
-    "for the current browser session and is not saved to a permanent database."
-)
 
 # -------------------- ROUTE PLANNER --------------------
 st.subheader("Plan an Emergency Route")
