@@ -124,79 +124,92 @@ if "current_routes" not in st.session_state:
 st.markdown(
     """
     <style>
-    /* UrbanPulse readability pass — styling only */
     .stApp {
         background: linear-gradient(rgba(7,18,36,.91), rgba(7,18,36,.94)),
         url("https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=2000&q=80");
         background-size: cover;
         background-attachment: fixed;
         color: #f5f7fb;
-        font-size: 17px;
+        font-size: 18px !important;
     }
     [data-testid="stHeader"] { background: rgba(0,0,0,0); }
 
-    /* Explicit selectors + !important to override Streamlit defaults */
-    .stApp h1, .stApp [data-testid="stHeading"] h1 {
-        font-size: 42px !important;
+    /* Headings: target Streamlit's rendered heading nodes */
+    .stApp [data-testid="stHeading"] h1,
+    .stApp h1 {
+        font-size: 44px !important;
         line-height: 1.2 !important;
         font-weight: 800 !important;
     }
-    .stApp h2, .stApp [data-testid="stHeading"] h2 {
-        font-size: 32px !important;
+    .stApp [data-testid="stHeading"] h2,
+    .stApp h2 {
+        font-size: 34px !important;
         line-height: 1.3 !important;
         font-weight: 750 !important;
     }
-    .stApp h3, .stApp [data-testid="stHeading"] h3 {
-        font-size: 25px !important;
+    .stApp [data-testid="stHeading"] h3,
+    .stApp h3,
+    .stApp h4 {
+        font-size: 27px !important;
         line-height: 1.35 !important;
         font-weight: 700 !important;
     }
 
+    /* Regular content + captions */
     .stApp [data-testid="stMarkdownContainer"] p,
     .stApp [data-testid="stText"],
     .stApp .stMarkdown p,
     .stApp li,
     .stApp label,
-    .stApp [data-testid="stWidgetLabel"] p {
+    .stApp [data-testid="stWidgetLabel"] p,
+    .stApp [data-testid="stCaptionContainer"],
+    .stApp [data-testid="stCaptionContainer"] * {
         font-size: 18px !important;
         line-height: 1.65 !important;
     }
-    .stApp [data-testid="stCaptionContainer"],
-    .stApp [data-testid="stCaptionContainer"] * {
-        font-size: 16px !important;
-        line-height: 1.55 !important;
-    }
-    .stApp input, .stApp textarea,
-    .stApp [data-baseweb="select"] *,
+
+    /* Inputs, dropdown options, and buttons */
+    .stApp input,
+    .stApp textarea,
+    .stApp [data-baseweb="select"] div,
+    .stApp [data-baseweb="select"] span,
+    .stApp [data-baseweb="popover"] li,
     .stApp button,
     .stApp [data-testid="stFormSubmitButton"] button,
     .stApp [data-testid="stLinkButton"] a {
-        font-size: 17px !important;
+        font-size: 18px !important;
     }
+
     [data-testid="stMetric"] {
         background: rgba(255,255,255,.08);
         border: 1px solid rgba(255,255,255,.16);
         padding: 18px;
         border-radius: 14px;
     }
-    [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] * { font-size: 17px !important; }
-    [data-testid="stMetricValue"], [data-testid="stMetricValue"] * { font-size: 34px !important; }
+    [data-testid="stMetricLabel"],
+    [data-testid="stMetricLabel"] * {
+        font-size: 18px !important;
+    }
+    [data-testid="stMetricValue"],
+    [data-testid="stMetricValue"] * {
+        font-size: 36px !important;
+    }
 
     div.stButton > button,
     div[data-testid="stFormSubmitButton"] > button,
     div[data-testid="stLinkButton"] > a {
         border-radius: 10px;
         font-weight: 650;
-        min-height: 3rem;
-        padding: 0.65rem 1rem;
+        min-height: 3.1rem;
+        padding: 0.7rem 1rem;
     }
-    [data-testid="stDataFrame"] { font-size: 1rem; }
+    [data-testid="stDataFrame"] { font-size: 17px !important; }
 
     @media (max-width: 768px) {
-        .stApp h1, .stApp [data-testid="stHeading"] h1 { font-size: 34px !important; }
-        .stApp h2, .stApp [data-testid="stHeading"] h2 { font-size: 27px !important; }
-        .stApp h3, .stApp [data-testid="stHeading"] h3 { font-size: 22px !important; }
-        [data-testid="stMetricValue"], [data-testid="stMetricValue"] * { font-size: 28px !important; }
+        .stApp [data-testid="stHeading"] h1, .stApp h1 { font-size: 35px !important; }
+        .stApp [data-testid="stHeading"] h2, .stApp h2 { font-size: 28px !important; }
+        .stApp [data-testid="stHeading"] h3, .stApp h3, .stApp h4 { font-size: 23px !important; }
+        [data-testid="stMetricValue"], [data-testid="stMetricValue"] * { font-size: 29px !important; }
     }
     </style>
     """,
