@@ -1,112 +1,78 @@
 # 🚑 UrbanPulse — Emergency Hospital Finder & Route Planner
 
-UrbanPulse is a machine learning-based emergency route planning prototype designed to help users identify nearby hospitals, compare alternative driving routes, and estimate travel time.
+**An ML-powered prototype for hospital discovery, ETA prediction, and alternative route comparison.**
 
-## ✨ Features
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-EC6C2D?style=for-the-badge&logo=xgboost&logoColor=white)](https://xgboost.readthedocs.io/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
 
-- **Pickup Location Search:** Enter a location, address, or landmark.
-- **Nearby Hospital Finder:** Identify and rank hospitals by road distance.
-- **Alternative Route Comparison:** Retrieve available driving routes using OSRM.
-- **ANN-Based ETA Prediction:** Predict the estimated travel time for the complete pickup-to-hospital journey.
-- **XGBoost Route Ranking:** Experimentally rank alternative routes using the existing trained model.
-- **Interactive Maps:** Visualize selected routes using Folium and OpenStreetMap.
-- **Google Maps Integration:** Open pickup-to-hospital directions.
-- **Trip History:** Save selected routes and export trip history as CSV.
+**🔗 GitHub Repository:** [UrbanPulse](https://github.com/Anujsharma-labs/urbanpulse)
+
+---
+
+## 📸 Application Preview
+
+![UrbanPulse Application](./Untitled.png)
+
+## 💡 Overview
+
+UrbanPulse is a machine-learning-based prototype that helps users find hospitals, compare alternative driving routes, and estimate journey duration through an interactive web application.
+
+## ✨ Key Features
+
+- 🏥 Hospital discovery based on pickup location
+- 🗺️ Alternative driving route comparison
+- 🧠 ANN-based whole-journey ETA prediction
+- ⚡ Experimental XGBoost-based route ranking
+- 📍 Interactive map visualization
+- 🌐 Streamlit web application
 
 ## 🛠️ Tech Stack
 
-- Python
-- Streamlit
-- TensorFlow / Keras
-- XGBoost
-- Pandas and NumPy
-- Scikit-learn
-- Folium and Streamlit-Folium
-- OpenStreetMap, Nominatim and OSRM
+- **Programming:** Python
+- **Machine Learning:** TensorFlow/Keras, XGBoost, Scikit-learn
+- **Data Processing:** Pandas, NumPy
+- **Database:** SQL Server
+- **Web App:** Streamlit
+- **Mapping & Routing:** Folium, OpenStreetMap, OSRM, Nominatim
 
-## 🧠 Machine Learning Models
+## 🤖 Machine Learning
 
-### Artificial Neural Network (ANN)
-Predicts the complete trip duration using pickup and destination coordinates and straight-line distance (`hdist`).
+**ANN:** Estimates the duration of the complete pickup-to-hospital journey using distance and geographic coordinates.
 
-### XGBoost Regressor
-Uses the same five input features for travel-duration prediction. In this prototype, it is experimentally used to rank alternative routes.
+**XGBoost:** Integrated experimentally to rank alternative routes using available model features. Route-ranking performance has not been independently validated.
 
-**Note:** The current models were trained on trip-level data rather than individual alternative-route data. Therefore, route-specific ranking has not been independently validated.
-
-## 📁 Project Structure
-
-```text
-UrbanPulse/
-├── app.py
-├── requirements.txt
-├── README.md
-├── .gitignore
-├── jaipur_model.pkl
-├── jaipur_scaler.pkl
-├── data/
-│   └── jaipur_ml_data.parquet
-├── models/
-│   └── xgboost_route_model.pkl
-└── src/
-    └── multiple_route.py
-```
-
-## ⚙️ Installation and Setup
-
-### 1. Clone the repository
+## 🚀 Run Locally
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd UrbanPulse
-```
-
-### 2. Create a virtual environment
-
-```bash
+git clone https://github.com/Anujsharma-labs/urbanpulse.git
+cd urbanpulse
 python -m venv .venv
 ```
 
-Activate it on Windows:
-
-```bash
-.venv\Scripts\activate
-```
-
-### 3. Install dependencies
+Activate the environment, then install dependencies:
 
 ```bash
 pip install -r requirements.txt
-```
-
-### 4. Run the application
-
-```bash
 streamlit run app.py
 ```
 
-Ensure that the trained model files are present at the paths expected by `app.py`.
-
-## 📊 Model Evaluation
-
-The XGBoost model achieved the following results on the held-out test dataset:
-
-- **MAE:** Approximately 1.39 minutes
-- **RMSE:** Approximately 2.10 minutes
-- **R² Score:** Approximately 96.47%
-
-These results describe the existing trip-duration prediction task. They do not establish the accuracy of alternative-route ranking.
+Ensure all required model files exist at the paths configured in `app.py`.
 
 ## ⚠️ Limitations
 
-- Live traffic conditions are not included.
-- Alternative routes depend on OSRM availability.
-- Hospital coordinates are approximate and should be verified.
-- Ambulance-specific restrictions and road closures are not verified.
-- Route-specific ETA and ranking require further validation.
+- No live traffic integration.
+- ETA and route ranking require further validation.
+- Routing and geocoding depend on external services.
+- This is a prototype, not a certified emergency dispatch system.
 
-UrbanPulse is an educational portfolio prototype and is not intended to replace verified emergency dispatch or navigation systems.
+## 👨‍💻 Author
 
-## 👨‍💻 Project Goal
+**Anuj Sharma**
 
-To demonstrate the integration of machine learning, geospatial routing, interactive maps, and a web-based interface in an emergency hospital route planning prototype.
+Python | Machine Learning | SQL | Data Analytics
+
+---
+
+⭐ If you find this project interesting, consider starring the repository!
