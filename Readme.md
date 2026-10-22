@@ -1,65 +1,67 @@
-# 🚑 UrbanPulse — Emergency Route Intelligence
+# 🚑 UrbanPulse — Emergency Hospital Finder & Route Planner
 
-### *Faster Routes. Smarter Decisions. Every Second Matters.*
+UrbanPulse is a machine learning-based emergency route planning prototype designed to help users identify nearby hospitals, compare alternative driving routes, and estimate travel time.
 
-UrbanPulse is a smart emergency route planning application designed to simplify journey planning through interactive route visualization, road distance calculation, and estimated travel time (ETA).
+## ✨ Features
 
-Built using **Python, Streamlit, SQL Server, and OSRM**, UrbanPulse combines routing services, interactive maps, and database integration in a modern dashboard to support smarter emergency journey planning.
-
-## 🖥️ Dashboard Preview
-
-![UrbanPulse Dashboard](Untitled.png)
-
-## ✨ Key Features
-
-- 🚑 **Emergency Route Planning** — Select pickup and destination locations to find a suggested road route.
-- 🗺️ **Interactive Route Map** — Visualize the route with pickup and destination markers.
-- ⏱️ **ETA Estimation** — Estimate travel duration using routing service data.
-- 📏 **Road Distance Calculation** — Calculate the driving distance between selected locations.
-- 📍 **Location Selection** — Choose from predefined locations in Jaipur.
-- 💾 **Trip History Management** — Save trip details to SQL Server and review previous journeys.
-- 🌌 **Modern Dashboard UI** — Dark-themed interface with a background image and glass-style panels.
+- **Pickup Location Search:** Enter a location, address, or landmark.
+- **Nearby Hospital Finder:** Identify and rank hospitals by road distance.
+- **Alternative Route Comparison:** Retrieve available driving routes using OSRM.
+- **ANN-Based ETA Prediction:** Predict the estimated travel time for the complete pickup-to-hospital journey.
+- **XGBoost Route Ranking:** Experimentally rank alternative routes using the existing trained model.
+- **Interactive Maps:** Visualize selected routes using Folium and OpenStreetMap.
+- **Google Maps Integration:** Open pickup-to-hospital directions.
+- **Trip History:** Save selected routes and export trip history as CSV.
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| Python | Core application logic |
-| Streamlit | Interactive web application |
-| OSRM | Road routing and travel-time estimates |
-| Folium | Interactive map visualization |
-| Streamlit-Folium | Integrating maps into Streamlit |
-| SQL Server | Persistent trip history storage |
-| PyODBC | Database connectivity |
-| Pandas | Tabular data handling |
-| Requests | Routing API communication |
+- Python
+- Streamlit
+- TensorFlow / Keras
+- XGBoost
+- Pandas and NumPy
+- Scikit-learn
+- Folium and Streamlit-Folium
+- OpenStreetMap, Nominatim and OSRM
 
-## 🔄 How It Works
+## 🧠 Machine Learning Models
 
-1. **Select Locations:** Choose a pickup point and destination.
-2. **Calculate Route:** The application requests a driving route from OSRM.
-3. **Estimate Journey:** Retrieve the road distance and estimated travel duration.
-4. **Visualize Route:** Display the suggested route on an interactive map.
-5. **Save Trip:** Store the trip details in SQL Server.
-6. **Review History:** View previously saved trips in the dashboard.
+### Artificial Neural Network (ANN)
+Predicts the complete trip duration using pickup and destination coordinates and straight-line distance (`hdist`).
 
-## 🚀 Getting Started
+### XGBoost Regressor
+Uses the same five input features for travel-duration prediction. In this prototype, it is experimentally used to rank alternative routes.
 
-### Prerequisites
+**Note:** The current models were trained on trip-level data rather than individual alternative-route data. Therefore, route-specific ranking has not been independently validated.
 
-- Python 3.10 or a compatible version
-- SQL Server
-- Microsoft ODBC Driver 17 for SQL Server
-- Internet connection for routing and map tiles
+## 📁 Project Structure
 
-### 1. Clone the Repository
+```text
+UrbanPulse/
+├── app.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+├── jaipur_model.pkl
+├── jaipur_scaler.pkl
+├── data/
+│   └── jaipur_ml_data.parquet
+├── models/
+│   └── xgboost_route_model.pkl
+└── src/
+    └── multiple_route.py
+```
+
+## ⚙️ Installation and Setup
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Anujsharma-labs/UrbanPulse.git
+git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd UrbanPulse
 ```
 
-### 2. Create a Virtual Environment
+### 2. Create a virtual environment
 
 ```bash
 python -m venv .venv
@@ -71,78 +73,40 @@ Activate it on Windows:
 .venv\Scripts\activate
 ```
 
-### 3. Install Dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Ensure `requirements.txt` contains:
-
-```text
-streamlit
-pandas
-pyodbc
-requests
-folium
-streamlit-folium
-```
-
-### 4. Configure SQL Server
-
-Make sure SQL Server is running and the `UrbanPulse` database and required `dbo.jaipur_trip_predictions` table exist.
-
-Update the database connection in `app.py` to match your local SQL Server instance. The current configuration uses Windows Trusted Authentication.
-
-### 5. Run UrbanPulse
+### 4. Run the application
 
 ```bash
 streamlit run app.py
 ```
 
-Open the local URL displayed in the terminal to access the dashboard.
+Ensure that the trained model files are present at the paths expected by `app.py`.
 
-## 📂 Project Structure
+## 📊 Model Evaluation
 
-```text
-UrbanPulse/
-├── app.py
-├── requirements.txt
-├── README.md
-├── .gitignore
-└── screenshots/
-    └── urbanpulse_dashboard.png
-```
+The XGBoost model achieved the following results on the held-out test dataset:
 
-## 📊 Project Highlights
+- **MAE:** Approximately 1.39 minutes
+- **RMSE:** Approximately 2.10 minutes
+- **R² Score:** Approximately 96.47%
 
-- Integration of a real road-routing service.
-- End-to-end route calculation and interactive visualization.
-- SQL Server integration for persistent trip records.
-- A user-friendly dashboard built with Streamlit.
-- A modular foundation for future emergency mobility features.
-
-## 🔮 Future Enhancements
-
-- 🚦 Live traffic integration for more realistic ETA estimates.
-- 🏥 Nearby hospital discovery and expanded location coverage.
-- 🚨 Ambulance-aware routing using suitable routing services and road data.
-- 📈 Trip analytics and journey insights.
-- ☁️ Cloud deployment with securely hosted database infrastructure.
+These results describe the existing trip-duration prediction task. They do not establish the accuracy of alternative-route ranking.
 
 ## ⚠️ Limitations
 
-- The current version uses predefined locations in Jaipur.
-- ETA is an estimate from the routing service and is not guaranteed to reflect live traffic conditions.
-- Live traffic analysis, ambulance-priority signals, and emergency dispatch are not currently implemented.
-- The SQL Server connection is configured for a local environment and requires separate configuration for cloud deployment.
+- Live traffic conditions are not included.
+- Alternative routes depend on OSRM availability.
+- Hospital coordinates are approximate and should be verified.
+- Ambulance-specific restrictions and road closures are not verified.
+- Route-specific ETA and ranking require further validation.
 
-## 👨‍💻 Author
+UrbanPulse is an educational portfolio prototype and is not intended to replace verified emergency dispatch or navigation systems.
 
-**Anuj Sharma**
+## 👨‍💻 Project Goal
 
-GitHub: [@Anujsharma-labs](https://github.com/Anujsharma-labs)
-
----
-
-*UrbanPulse — building smarter journeys through routing technology and data-driven applications.* 🚑
+To demonstrate the integration of machine learning, geospatial routing, interactive maps, and a web-based interface in an emergency hospital route planning prototype.
