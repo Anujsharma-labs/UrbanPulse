@@ -20,8 +20,9 @@ OSRM_BASE = "https://router.project-osrm.org"
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ANN_MODEL_PATH = os.path.join(BASE_DIR, "jaipur_model.pkl")
-ANN_SCALER_PATH = os.path.join(BASE_DIR, "jaipur_scaler.pkl")
-XGB_MODEL_PATH = os.path.join(BASE_DIR, "models", "xgboost_route_model.pkl")
+ANN_SCALER_PATH = os.path.join(BASE_DIR, "jaipur_scaler.pkl")XGB_MODEL_PATH = os.path.join(
+    BASE_DIR, "models", "xgboost_route_model.pkl"
+)
 FEATURES = ["hdist", "lat_orig", "lon_orig", "lat_dest", "lon_dest"]
 
 
