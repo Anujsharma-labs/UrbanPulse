@@ -135,23 +135,43 @@ st.markdown(
     }
     [data-testid="stHeader"] { background: rgba(0,0,0,0); }
 
-    h1 { font-size: 2.65rem !important; font-weight: 800 !important; }
-    h2 { font-size: 2rem !important; font-weight: 750 !important; }
-    h3 { font-size: 1.55rem !important; font-weight: 700 !important; }
-
-    .stApp p, .stApp li, .stApp label,
-    [data-testid="stMarkdownContainer"] p {
-        font-size: 1.05rem;
-        line-height: 1.65;
+    /* Explicit selectors + !important to override Streamlit defaults */
+    .stApp h1, .stApp [data-testid="stHeading"] h1 {
+        font-size: 42px !important;
+        line-height: 1.2 !important;
+        font-weight: 800 !important;
     }
-    .stApp [data-testid="stCaptionContainer"] {
-        font-size: 0.98rem;
-        line-height: 1.55;
+    .stApp h2, .stApp [data-testid="stHeading"] h2 {
+        font-size: 32px !important;
+        line-height: 1.3 !important;
+        font-weight: 750 !important;
+    }
+    .stApp h3, .stApp [data-testid="stHeading"] h3 {
+        font-size: 25px !important;
+        line-height: 1.35 !important;
+        font-weight: 700 !important;
+    }
+
+    .stApp [data-testid="stMarkdownContainer"] p,
+    .stApp [data-testid="stText"],
+    .stApp .stMarkdown p,
+    .stApp li,
+    .stApp label,
+    .stApp [data-testid="stWidgetLabel"] p {
+        font-size: 18px !important;
+        line-height: 1.65 !important;
+    }
+    .stApp [data-testid="stCaptionContainer"],
+    .stApp [data-testid="stCaptionContainer"] * {
+        font-size: 16px !important;
+        line-height: 1.55 !important;
     }
     .stApp input, .stApp textarea,
     .stApp [data-baseweb="select"] *,
-    .stApp button {
-        font-size: 1rem !important;
+    .stApp button,
+    .stApp [data-testid="stFormSubmitButton"] button,
+    .stApp [data-testid="stLinkButton"] a {
+        font-size: 17px !important;
     }
     [data-testid="stMetric"] {
         background: rgba(255,255,255,.08);
@@ -159,8 +179,8 @@ st.markdown(
         padding: 18px;
         border-radius: 14px;
     }
-    [data-testid="stMetricLabel"] { font-size: 1rem !important; }
-    [data-testid="stMetricValue"] { font-size: 2rem !important; }
+    [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] * { font-size: 17px !important; }
+    [data-testid="stMetricValue"], [data-testid="stMetricValue"] * { font-size: 34px !important; }
 
     div.stButton > button,
     div[data-testid="stFormSubmitButton"] > button,
@@ -173,10 +193,10 @@ st.markdown(
     [data-testid="stDataFrame"] { font-size: 1rem; }
 
     @media (max-width: 768px) {
-        h1 { font-size: 2.1rem !important; }
-        h2 { font-size: 1.65rem !important; }
-        h3 { font-size: 1.3rem !important; }
-        [data-testid="stMetricValue"] { font-size: 1.65rem !important; }
+        .stApp h1, .stApp [data-testid="stHeading"] h1 { font-size: 34px !important; }
+        .stApp h2, .stApp [data-testid="stHeading"] h2 { font-size: 27px !important; }
+        .stApp h3, .stApp [data-testid="stHeading"] h3 { font-size: 22px !important; }
+        [data-testid="stMetricValue"], [data-testid="stMetricValue"] * { font-size: 28px !important; }
     }
     </style>
     """,
