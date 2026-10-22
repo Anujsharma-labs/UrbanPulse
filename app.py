@@ -124,12 +124,60 @@ if "current_routes" not in st.session_state:
 st.markdown(
     """
     <style>
-    .stApp { background: linear-gradient(rgba(7,18,36,.91), rgba(7,18,36,.94)),
-    url("https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=2000&q=80");
-    background-size: cover; background-attachment: fixed; color: #f5f7fb; }
+    /* UrbanPulse readability pass — styling only */
+    .stApp {
+        background: linear-gradient(rgba(7,18,36,.91), rgba(7,18,36,.94)),
+        url("https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=2000&q=80");
+        background-size: cover;
+        background-attachment: fixed;
+        color: #f5f7fb;
+        font-size: 17px;
+    }
     [data-testid="stHeader"] { background: rgba(0,0,0,0); }
-    [data-testid="stMetric"] { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); padding: 14px; border-radius: 14px; }
-    div.stButton > button { border-radius: 10px; font-weight: 600; min-height: 2.7rem; }
+
+    h1 { font-size: 2.65rem !important; font-weight: 800 !important; }
+    h2 { font-size: 2rem !important; font-weight: 750 !important; }
+    h3 { font-size: 1.55rem !important; font-weight: 700 !important; }
+
+    .stApp p, .stApp li, .stApp label,
+    [data-testid="stMarkdownContainer"] p {
+        font-size: 1.05rem;
+        line-height: 1.65;
+    }
+    .stApp [data-testid="stCaptionContainer"] {
+        font-size: 0.98rem;
+        line-height: 1.55;
+    }
+    .stApp input, .stApp textarea,
+    .stApp [data-baseweb="select"] *,
+    .stApp button {
+        font-size: 1rem !important;
+    }
+    [data-testid="stMetric"] {
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.16);
+        padding: 18px;
+        border-radius: 14px;
+    }
+    [data-testid="stMetricLabel"] { font-size: 1rem !important; }
+    [data-testid="stMetricValue"] { font-size: 2rem !important; }
+
+    div.stButton > button,
+    div[data-testid="stFormSubmitButton"] > button,
+    div[data-testid="stLinkButton"] > a {
+        border-radius: 10px;
+        font-weight: 650;
+        min-height: 3rem;
+        padding: 0.65rem 1rem;
+    }
+    [data-testid="stDataFrame"] { font-size: 1rem; }
+
+    @media (max-width: 768px) {
+        h1 { font-size: 2.1rem !important; }
+        h2 { font-size: 1.65rem !important; }
+        h3 { font-size: 1.3rem !important; }
+        [data-testid="stMetricValue"] { font-size: 1.65rem !important; }
+    }
     </style>
     """,
     unsafe_allow_html=True,
