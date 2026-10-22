@@ -58,17 +58,18 @@ def make_features(pickup, destination, hdist=None):
 
 @st.cache_resource
 def load_models():
-    ann = load_pickle(ANN_MODEL_PATH)
-    scaler = load_pickle(ANN_SCALER_PATH)
+    return (
+        load_pickle(ANN_MODEL_PATH),
+        load_pickle(ANN_SCALER_PATH),
+        load_pickle(XGB_MODEL_PATH),
+    )
 
-    try:
-        xgb = load_pickle(XGB_MODEL_PATH)
-        st.success(f"XGBoost loaded: {type(xgb).__name__}")
-    except Exception as e:
-        st.error(f"XGBoost loading failed: {type(e).__name__}: {e}")
-        xgb = None
 
-    return ann, scaler, xgb
+try:
+    ann_model, ann_scaler, xgb_model = load_models()
+except Exception as exc:
+    ann_model, ann_scaler, xgb_model = None, None, None
+    st.warning(f"Unable to load models: {exc}")
 
 
 def predict_ann_eta(pickup, destination):
