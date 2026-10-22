@@ -1,5 +1,10 @@
 streamlit
 pandas
+numpy
 requests
 folium
 streamlit-folium
+scikit-learn
+xgboost
+tensorflow
+pyarrow
