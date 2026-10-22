@@ -29,11 +29,11 @@ FEATURES = ["hdist", "lat_orig", "lon_orig", "lat_dest", "lon_dest"]
 
 @st.cache_resource
 def load_pickle(path):
-    if not os.path.exists(path):
-        return None
-    with open(path, "rb") as model_file:
-        return pickle.load(model_file)
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"Model file not found: {path}")
 
+    with open(path, "rb") as file:
+        return pickle.load(file)
 
 def haversine_km(origin, destination):
     """Straight-line distance in km, matching the training hdist feature."""
