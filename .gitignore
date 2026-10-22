@@ -1,6 +1,29 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
 .venv/
 venv/
-__pycache__/
-*.pyc
+env/
+
+# Environment variables and secrets
 .env
-.streamlit/secrets.toml
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+.streamlit/
+
+# Local test outputs
+urbanpulse_trip_history.csv
