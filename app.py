@@ -466,6 +466,5 @@ if st.session_state.trip_history:
 
 st.divider()
 st.caption(
-    "UrbanPulse • Pickup locations are geocoded with OpenStreetMap Nominatim; hospital road-distance ranking "
-    "and alternative route geometry are provided by OSRM. Prototype only; verify routes before real-world use."
+    "UrbanPulse • Prototype only; verify routes before real-world use."
 )
