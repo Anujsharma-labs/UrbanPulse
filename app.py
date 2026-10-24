@@ -46,7 +46,7 @@ ANN_SCALER_PATH = os.path.join(BASE_DIR, "jaipur_scaler.pkl")
 
 XGB_MODEL_PATH = os.path.join(
 
-    BASE_DIR, "xgb_ranker.pkl"
+    BASE_DIR, "models", "xgb_ranker.pkl"
 
 )
 
