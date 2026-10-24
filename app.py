@@ -404,35 +404,48 @@ st.markdown(
 
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
 def geocode_pickup(address: str):
-
-    """Convert a user-entered address/landmark into (lat, lon) with Nominatim."""
-
-    response = requests.get(
-
-        NOMINATIM_URL,
-
-        params={"q": address, "format": "jsonv2", "limit": 1, "countrycodes": "in"},
-
-        headers={"User-Agent": "UrbanPulse-Demo/1.0 (emergency-route-planning prototype)"},
-
-        timeout=20,
-
-    )
-
-    response.raise_for_status()
-
-    results = response.json()
+    """Geocode an address using Nominatim and cache successful lookups."""
+    try:
+        response = requests.get(
+            NOMINATIM_URL,
+            params={
+                "q": address,
+                "format": "jsonv2",
+                "limit": 1,
+                "countrycodes": "in",
+            },
+            headers={
+                "User-Agent": "UrbanPulse-Demo/1.0 (emergency-route-planning prototype)"
+            },
+            timeout=(5, 20),
+        )
+        response.raise_for_status()
+        results = response.json()
+    except requests.Timeout as exc:
+        raise requests.Timeout(
+            "Nominatim geocoding timed out. Please retry in a moment."
+        ) from exc
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else "unknown"
+        raise requests.HTTPError(
+            f"Nominatim returned HTTP {status}; it may be rate-limiting or temporarily unavailable."
+        ) from exc
+    except requests.RequestException as exc:
+        raise requests.RequestException(f"Could not connect to Nominatim: {exc}") from exc
+    except ValueError as exc:
+        raise ValueError("Nominatim returned an invalid response.") from exc
 
     if not results:
-
-        raise ValueError("Address not found. Try a landmark with Jaipur, Rajasthan.")
-
+        raise ValueError(
+            "Address not found. Try a well-known landmark with Jaipur, Rajasthan."
+        )
     item = results[0]
-
-    return (float(item["lat"]), float(item["lon"])), item.get("display_name", address)
-
-
+    return (
+        (float(item["lat"]), float(item["lon"])),
+        item.get("display_name", address),
+    )
 
 
 
@@ -448,27 +461,28 @@ def rank_hospitals(pickup):
 
     url = f"{OSRM_BASE}/table/v1/driving/{coord_string}"
 
-    response = requests.get(
-
-        url,
-
-        params={
-
-            "sources": "0",
-
-            "destinations": ";".join(str(i) for i in range(1, len(all_coords))),
-
-            "annotations": "distance,duration",
-
-        },
-
-        timeout=25,
-
-    )
-
-    response.raise_for_status()
-
-    data = response.json()
+    try:
+        response = requests.get(
+            url,
+            params={
+                "sources": "0",
+                "destinations": ";".join(str(i) for i in range(1, len(all_coords))),
+                "annotations": "distance,duration",
+            },
+            headers={"User-Agent": "UrbanPulse-Demo/1.0"},
+            timeout=(5, 30),
+        )
+        response.raise_for_status()
+        data = response.json()
+    except requests.Timeout as exc:
+        raise requests.Timeout("OSRM hospital-ranking request timed out. Please retry.") from exc
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else "unknown"
+        raise requests.HTTPError(f"OSRM Table API returned HTTP {status}.") from exc
+    except requests.RequestException as exc:
+        raise requests.RequestException(f"Could not connect to OSRM Table API: {exc}") from exc
+    except ValueError as exc:
+        raise ValueError("OSRM Table API returned an invalid JSON response.") from exc
 
     if data.get("code") != "Ok" or not data.get("distances") or not data.get("durations"):
 
@@ -516,19 +530,24 @@ def get_route(pickup, pickup_label, hospital):
 
     coord_string = f"{pickup[1]},{pickup[0]};{destination[1]},{destination[0]}"
 
-    response = requests.get(
-
-        f"{OSRM_BASE}/route/v1/driving/{coord_string}",
-
-        params={"overview": "full", "geometries": "geojson", "alternatives": 3},
-
-        timeout=25,
-
-    )
-
-    response.raise_for_status()
-
-    data = response.json()
+    try:
+        response = requests.get(
+            f"{OSRM_BASE}/route/v1/driving/{coord_string}",
+            params={"overview": "full", "geometries": "geojson", "alternatives": 3},
+            headers={"User-Agent": "UrbanPulse-Demo/1.0"},
+            timeout=(5, 30),
+        )
+        response.raise_for_status()
+        data = response.json()
+    except requests.Timeout as exc:
+        raise requests.Timeout("OSRM route request timed out. Please retry.") from exc
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else "unknown"
+        raise requests.HTTPError(f"OSRM Route API returned HTTP {status}.") from exc
+    except requests.RequestException as exc:
+        raise requests.RequestException(f"Could not connect to OSRM Route API: {exc}") from exc
+    except ValueError as exc:
+        raise ValueError("OSRM Route API returned an invalid JSON response.") from exc
 
     if data.get("code") != "Ok" or not data.get("routes"):
 
