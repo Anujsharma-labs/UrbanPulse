@@ -722,11 +722,9 @@ if find_clicked:
 
             st.success("Pickup location found. Hospitals are ranked by road distance.")
 
-       except requests.RequestException as exc:
-    st.error(
-        f"Geocoding/routing request failed: "
-        f"{type(exc).__name__}: {exc}"
-    )
+        except requests.RequestException:
+
+            st.error("The geocoding or routing service is currently unavailable. Please try again later.")
 
         except (ValueError, KeyError) as exc:
 
